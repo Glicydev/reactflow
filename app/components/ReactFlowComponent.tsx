@@ -162,12 +162,8 @@ export default function ReactFlowComponent() {
         y={menuCoor.y}
         onClose={() => setMenuOpened(false)}
       >
-        <li onClick={onClickDelete}>
-          🗑️ Supprimer
-        </li>
-        <li onClick={onClickDelete}>
-          🗑️ Supprimer 2
-        </li>
+        <li onClick={onClickDelete}>🗑️ Supprimer</li>
+        <li onClick={onClickDelete}>🗑️ Supprimer 2</li>
       </ContextMenu>
     </ReactFlow>
   );
