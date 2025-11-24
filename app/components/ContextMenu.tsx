@@ -42,7 +42,7 @@ export default function ContextMenu({
       {isOpened && (
         <motion.ul
           ref={menuRef}
-          className={`bg-neutral-900 hover:bg-neutral-800 cursor-pointer w-50 rounded-lg absolute overflow-hidden z-10`}
+          className={`contextMenu bg-neutral-900 border border-neutral-800 cursor-pointer w-50 rounded-lg absolute overflow-hidden z-10`}
           style={{
             left: `${x}px`,
             top: `${y}px`

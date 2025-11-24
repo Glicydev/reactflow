@@ -11,7 +11,7 @@ export default function Button({
 }: ButtonProps) {
   return (
     <button
-      className={`bg-neutral-900 border border-neutral-800 rounded cursor-pointer hover:bg-neutral-800 ${classname}`}
+      className={`bg-neutral-800/65 transition-all px-5 border border-neutral-700/50 rounded cursor-pointer hover:bg-neutral-800 ${classname}`}
       onClick={onClick}
     >
       {text}

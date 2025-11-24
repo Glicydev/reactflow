@@ -43,11 +43,16 @@ export default function ReactFlowComponent() {
 
   const [id, setId] = useState(2);
 
-  const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
-  const [selectedEdges, setSelectedEdges] = useState<Edge[]>([]);
-
   const [menuOpened, setMenuOpened] = useState<boolean>(false);
   const [menuCoor, setMenuCoor] = useState<ICoordinates>({ x: 0, y: 0 });
+
+  const selectedNodes = () => {
+    return nodes.filter((node) => node.selected);
+  };
+
+  const selectedEdges = () => {
+    return edges.filter((edge: Edge) => edge.selected);
+  };
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((edg) => addEdge(params, edg)),
@@ -56,7 +61,7 @@ export default function ReactFlowComponent() {
 
   const onAdd = () => {
     setId((id) => id + 1);
-    
+
     const newNode = {
       id: id.toString(),
       data: { label: `Input Node ${id}` },
@@ -67,29 +72,44 @@ export default function ReactFlowComponent() {
     setNodes((nodes: Node[]) => nodes.concat(newNode));
   };
 
-  const onNodeContextMenu = useCallback((e: MouseEvent, node: Node) => {
-    e.preventDefault();
+  const onNodeContextMenu = useCallback(
+    (e: MouseEvent, node: Node) => {
+      e.preventDefault();
 
-    setMenuCoor({
-      x: e.clientX,
-      y: e.clientY,
-    });
+      setMenuCoor({
+        x: e.clientX,
+        y: e.clientY,
+      });
 
-    setSelectedNodes((nodes) => [...nodes, node]);
+      setNodes((nds) =>
+        nds.map((n) => {
+          if (n.id === node.id) {
+            n.selected = true;
+          }
 
-    setMenuOpened(true);
-  }, []);
+          return n;
+        })
+      );
+
+      setMenuOpened(true);
+    },
+    [setNodes]
+  );
 
   const onClickDelete = () => {
-    if (!selectedNodes.length && !selectedEdges.length) return;
+    const selectedNodesList = selectedNodes();
+    const selectedEdgesList = selectedEdges();
+
+    if (!selectedNodesList.length && !selectedEdgesList.length) return;
 
     setEdges((edges) =>
       edges.filter(
-        (edge: Edge) => !selectedEdges.find((selEdge) => selEdge.id === edge.id)
+        (edge: Edge) =>
+          !selectedEdgesList.find((selEdge: Edge) => selEdge.id === edge.id)
       )
     );
 
-    selectedNodes.forEach((selectedNode) => {
+    selectedNodesList.forEach((selectedNode) => {
       setNodes((nodes) => nodes.filter((node) => node.id !== selectedNode.id));
 
       setEdges((edges) =>
@@ -103,11 +123,6 @@ export default function ReactFlowComponent() {
     setMenuOpened(false);
   };
 
-  const onNodeSelectionChange: OnSelectionChangeFunc<Node> = (params) => {
-    setSelectedNodes(params.nodes);
-    setSelectedEdges(params.edges);
-  };
-
   return (
     <ReactFlow
       nodes={nodes}
@@ -117,26 +132,26 @@ export default function ReactFlowComponent() {
       onConnect={onConnect}
       nodeTypes={nodeTypes}
       onNodeContextMenu={onNodeContextMenu}
-      onSelectionChange={onNodeSelectionChange}
       defaultEdgeOptions={{
         type: "custom-edge",
         label: "Edge",
+        animated: true,
       }}
       onMove={() => setMenuOpened(false)}
       colorMode="dark"
       fitView
     >
       <Background />
-      <div className="absolute left-1/2 bottom-8 -translate-x-1/2 flex justify-between gap-2 z-10 p-2 py-1 border border-neutral-800 rounded-full bg-neutral-800/50">
+      <div className="absolute left-1/2 bottom-8 -translate-x-1/2 flex justify-between gap-2 z-10 p-2 py-1 border border-neutral-800 rounded-full bg-neutral-900/50">
         <Button
           onClick={onAdd}
-          classname="w-11 aspect-square rounded-full"
+          classname="w-11 px-0! aspect-square rounded-full"
           text="+"
         />
         <Button
           onClick={onClickDelete}
-          classname="w-11 aspect-square rounded-full"
-          text="-"
+          classname="rounded-full"
+          text="Supprimer"
         />
       </div>
       <MiniMap position="bottom-right" />
@@ -147,11 +162,11 @@ export default function ReactFlowComponent() {
         y={menuCoor.y}
         onClose={() => setMenuOpened(false)}
       >
-        <li
-          className="cursor-pointer text-center w-full py-4 hover:bg-neutral-800/50"
-          onClick={onClickDelete}
-        >
+        <li onClick={onClickDelete}>
           🗑️ Supprimer
+        </li>
+        <li onClick={onClickDelete}>
+          🗑️ Supprimer 2
         </li>
       </ContextMenu>
     </ReactFlow>
