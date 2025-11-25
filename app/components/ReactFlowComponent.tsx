@@ -71,6 +71,17 @@ export default function ReactFlowComponent() {
     );
   };
 
+  const selectNodeOnly = (node: Node) => {
+    setNodes((nds) =>
+      nds.map((n) => {
+        return {
+          ...n,
+          selected: n.id === node.id,
+        };
+      })
+    );
+  };
+
   // Callbacks & events
   const onConnect = useCallback(
     (params: Connection) => setEdges((edge) => addEdge(params, edge)),
@@ -88,11 +99,11 @@ export default function ReactFlowComponent() {
     } satisfies Node;
 
     setNodes((nodes) => nodes.concat(newNode));
-    selectNode(newNode);
+    selectNodeOnly(newNode);
   };
 
-  const onNodeContextMenu = useCallback(
-    (e: MouseEvent, node: Node) => {
+  const onContextMenu = useCallback(
+    (e: MouseEvent) => {
       e.preventDefault();
 
       setMenuCoor({
@@ -100,11 +111,19 @@ export default function ReactFlowComponent() {
         y: e.clientY,
       });
 
-      selectNode(node);
-
       setMenuOpened(true);
     },
     [setNodes]
+  );
+
+  const onNodeContextMenu = useCallback(
+    (e: MouseEvent, node: Node) => {
+      e.preventDefault();
+
+      onContextMenu(e);
+      selectNode(node);
+    },
+    [onContextMenu, setNodes]
   );
 
   const onClickDelete = () => {
@@ -142,6 +161,7 @@ export default function ReactFlowComponent() {
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
       nodeTypes={nodeTypes}
+      onContextMenu={onContextMenu}
       onNodeContextMenu={onNodeContextMenu}
       defaultEdgeOptions={{
         type: "custom-edge",
