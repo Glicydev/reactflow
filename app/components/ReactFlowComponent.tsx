@@ -137,7 +137,7 @@ export default function ReactFlowComponent() {
         label: "Edge",
         animated: true,
       }}
-      onMove={() => setMenuOpened(false)}
+      onClick={() => setMenuOpened(false)}
       colorMode="dark"
       fitView
     >

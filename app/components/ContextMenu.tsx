@@ -1,7 +1,7 @@
 "use client";
 
 import { useClickOutside } from "@react-hooks-hub/use-click-outside";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, TargetAndTransition } from "framer-motion";
 import { ReactNode, useRef } from "react";
 
 interface ContextMenuProps {
@@ -22,14 +22,16 @@ export default function ContextMenu({
   const menuRef = useRef(null);
 
   const initState = {
-    y: -20,
+    y: -10,
     opacity: 0,
-  };
+    scale: 0.9
+  } as TargetAndTransition;
 
   const openState = {
     y: 0,
     opacity: 1,
-  };
+    scale: 1
+  } as TargetAndTransition;
 
   useClickOutside([menuRef], (isOutside) => {
     if (isOutside) {
