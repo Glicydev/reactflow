@@ -15,7 +15,7 @@ import {
   useEdgesState,
   useNodesState,
   ReactFlow,
-  OnSelectionChangeFunc,
+  NodeTypes,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 
@@ -26,11 +26,11 @@ const initialNodes = [
     position: { x: 0, y: 0 },
     type: "label",
   },
-] as Node[];
+] satisfies Node[];
 
 const nodeTypes = {
   label: CustomNode,
-};
+} satisfies NodeTypes;
 
 interface ICoordinates {
   x: number;
@@ -38,6 +38,7 @@ interface ICoordinates {
 }
 
 export default function ReactFlowComponent() {
+  // States
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -46,16 +47,33 @@ export default function ReactFlowComponent() {
   const [menuOpened, setMenuOpened] = useState<boolean>(false);
   const [menuCoor, setMenuCoor] = useState<ICoordinates>({ x: 0, y: 0 });
 
+  // Utils
   const selectedNodes = () => {
-    return nodes.filter((node) => node.selected);
+    return nodes.filter((node: Node) => node.selected);
   };
 
   const selectedEdges = () => {
     return edges.filter((edge: Edge) => edge.selected);
   };
 
+
+  const selectNode = (node: Node) => {
+    setNodes((nds) =>
+      nds.map((n) => {
+        if (n.id === node.id) {
+          return {
+            ...n,
+            selected: true,
+          };
+        }
+        return n;
+      })
+    );
+  };
+
+  // Callbacks & events
   const onConnect = useCallback(
-    (params: Connection) => setEdges((edg) => addEdge(params, edg)),
+    (params: Connection) => setEdges((edge) => addEdge(params, edge)),
     [setEdges]
   );
 
@@ -67,9 +85,10 @@ export default function ReactFlowComponent() {
       data: { label: `Input Node ${id}` },
       position: { x: 0, y: 0 },
       type: "label",
-    } as Node;
+    } satisfies Node;
 
-    setNodes((nodes: Node[]) => nodes.concat(newNode));
+    setNodes((nodes) => nodes.concat(newNode));
+    selectNode(newNode);
   };
 
   const onNodeContextMenu = useCallback(
@@ -81,15 +100,7 @@ export default function ReactFlowComponent() {
         y: e.clientY,
       });
 
-      setNodes((nds) =>
-        nds.map((n) => {
-          if (n.id === node.id) {
-            n.selected = true;
-          }
-
-          return n;
-        })
-      );
+      selectNode(node);
 
       setMenuOpened(true);
     },
@@ -142,7 +153,7 @@ export default function ReactFlowComponent() {
       fitView
     >
       <Background />
-      <div className="absolute left-1/2 bottom-8 -translate-x-1/2 flex justify-between gap-2 z-10 p-2 py-1 border border-neutral-800 rounded-full bg-neutral-900/50">
+      <div className="absolute backdrop-blur-[1px] left-1/2 bottom-8 -translate-x-1/2 flex justify-between gap-2 z-10 p-2 py-1 border border-neutral-800 rounded-full bg-neutral-900/50">
         <Button
           onClick={onAdd}
           classname="w-11 px-0! aspect-square rounded-full"

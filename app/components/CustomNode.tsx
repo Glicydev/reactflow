@@ -8,7 +8,7 @@ const CustomNode = ({ data, isConnectable, selected }: NodeProps<TextNode>) => {
   return (
     <>
       <div
-        className={`px-6 py-2 bg-neutral-800/70 rounded border ${
+        className={`px-6 py-2 bg-neutral-700/20 rounded backdrop-blur-[1px] border ${
           selected ? "border-blue-600/50" : "border-neutral-700"
         }`}
       >
