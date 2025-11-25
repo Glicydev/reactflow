@@ -40,7 +40,7 @@ interface ICoordinates {
 export default function ReactFlowComponent() {
   // States
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([] as Edge[]);
 
   const [id, setId] = useState(2);
 
@@ -58,28 +58,18 @@ export default function ReactFlowComponent() {
 
 
   const selectNode = (node: Node) => {
-    setNodes((nds) =>
-      nds.map((n) => {
-        if (n.id === node.id) {
-          return {
-            ...n,
-            selected: true,
-          };
-        }
-        return n;
-      })
-    );
+    setNodes((nds) => nds.map((n) =>
+      n.id === node.id ? { ...n, selected: true } : n));
   };
 
   const selectNodeOnly = (node: Node) => {
-    setNodes((nds) =>
-      nds.map((n) => {
-        return {
-          ...n,
-          selected: n.id === node.id,
-        };
-      })
-    );
+    setNodes((nds) => nds.map((n) =>
+      ({ ...n, selected: n.id === node.id })));
+  };
+
+  const selectEdge = (edge: Edge) => {
+    setEdges((edges: Edge[]) =>
+      edges.map((e: Edge) => e.id === edge.id ? { ...e, selected: true } : e));
   };
 
   // Callbacks & events
@@ -126,6 +116,16 @@ export default function ReactFlowComponent() {
     [onContextMenu, setNodes]
   );
 
+  const onEdgeContextMenu = useCallback(
+    (e: MouseEvent, edge: Edge) => {
+      e.preventDefault();
+
+      onContextMenu(e);
+      selectEdge(edge);
+    },
+    [onContextMenu, selectEdge]
+  );
+
   const onClickDelete = () => {
     const selectedNodesList = selectedNodes();
     const selectedEdgesList = selectedEdges();
@@ -163,6 +163,7 @@ export default function ReactFlowComponent() {
       nodeTypes={nodeTypes}
       onContextMenu={onContextMenu}
       onNodeContextMenu={onNodeContextMenu}
+      onEdgeContextMenu={onEdgeContextMenu}
       defaultEdgeOptions={{
         type: "custom-edge",
         label: "Edge",
