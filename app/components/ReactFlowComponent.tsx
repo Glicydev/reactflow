@@ -63,8 +63,12 @@ export default function ReactFlowComponent() {
   };
 
   const selectNodeOnly = (node: Node) => {
-    setNodes((nds) => nds.map((n) =>
-      ({ ...n, selected: n.id === node.id })));
+    setNodes((nds) => nds.map((n) => (
+      {
+        ...n,
+        selected: n.id === node.id
+      }
+    )));
   };
 
   const selectEdge = (edge: Edge) => {
